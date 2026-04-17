@@ -50,6 +50,16 @@
           </template>
         </el-table-column>
 
+        <el-table-column label="Prompt状态" width="120">
+          <template #default="{ row }">
+            <el-tooltip :content="row.analysis_prompt ? '已配置自定义Prompt' : '使用分类默认Prompt'" placement="top">
+              <el-tag :type="row.analysis_prompt ? 'success' : 'info'" size="small">
+                {{ row.analysis_prompt ? '自定义' : '继承' }}
+              </el-tag>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+
         <el-table-column prop="usage_count" label="使用次数" width="100" sortable />
         
         <el-table-column prop="created_at" label="创建时间" width="170">
@@ -75,55 +85,135 @@
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑模板' : '上传新模板'"
-      width="600px"
+      width="800px"
+      top="5vh"
     >
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
-        <el-form-item label="模板名称" prop="name">
-          <el-input v-model="form.name" placeholder="输入模板名称" />
-        </el-form-item>
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="模板名称" prop="name">
+              <el-input v-model="form.name" placeholder="输入模板名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="分类" prop="category">
+              <el-select v-model="form.category" placeholder="选择分类" style="width: 100%;">
+                <el-option label="人像" value="portrait" />
+                <el-option label="风景" value="landscape" />
+                <el-option label="美食" value="food" />
+                <el-option label="宠物" value="pet" />
+                <el-option label="建筑" value="architecture" />
+                <el-option label="街拍" value="street" />
+                <el-option label="静物" value="still_life" />
+                <el-option label="其他" value="other" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-        <el-form-item label="分类" prop="category">
-          <el-select v-model="form.category" placeholder="选择分类" style="width: 100%;">
-            <el-option label="人像" value="portrait" />
-            <el-option label="风景" value="landscape" />
-            <el-option label="美食" value="food" />
-            <el-option label="宠物" value="pet" />
-            <el-option label="街拍" value="street" />
-            <el-option label="其他" value="other" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="标签" prop="tags">
+        <el-form-item label="标签">
           <el-input
             v-model="form.tagsStr"
             placeholder="多个标签用逗号分隔，如：人像,经典,半身"
           />
         </el-form-item>
 
-        <el-form-item label="缩略图" prop="thumbnail">
-          <el-upload
-            class="uploader"
-            action="#"
-            :auto-upload="false"
-            :show-file-list="true"
-            :limit="1"
-            accept="image/*"
-            :on-change="handleFileChange"
-          >
-            <el-button type="primary">选择图片</el-button>
-            <template #tip>
-              <div style="font-size: 12px; color: #999; margin-top: 4px;">
-                支持 JPG/PNG/WebP，最大10MB
-              </div>
-            </template>
-          </el-upload>
+        <el-row :gutter="20">
+          <el-col :span="isEdit ? 24 : 16">
+            <el-form-item label="缩略图" prop="thumbnail">
+              <el-upload
+                class="uploader"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="true"
+                :limit="1"
+                accept="image/*"
+                :on-change="handleFileChange"
+              >
+                <el-button type="primary">选择图片</el-button>
+                <template #tip>
+                  <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                    支持 JPG/PNG/WebP，最大10MB
+                  </div>
+                </template>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8" v-if="!isEdit && form.thumbnail">
+            <el-image
+              :src="URL.createObjectURL(form.thumbnail)"
+              fit="cover"
+              style="width: 100%; height: 150px; border-radius: 8px;"
+            />
+          </el-col>
+        </el-row>
+
+        <el-divider content-position="left">
+          <el-icon><EditPen /></el-icon>
+          AI Prompt 配置（可选）
+        </el-divider>
+
+        <el-alert
+          type="info"
+          :closable="false"
+          show-icon
+          style="margin-bottom: 16px;"
+        >
+          <template #default>
+            <p style="margin: 0;">为该模板设置专属的AI分析指令。留空则自动继承所属分类的Prompt。</p>
+            <p style="margin: 4px 0 0 0;">
+              <a href="/categories" target="_blank" style="color: #409eff;" @click.prevent="$router.push('/categories')">
+                前往分类Prompt管理 →
+              </a>
+            </p>
+          </template>
+        </el-alert>
+
+        <el-form-item label="分析Prompt">
+          <el-input
+            v-model="form.analysis_prompt"
+            type="textarea"
+            :rows="6"
+            placeholder="留空则使用分类的默认分析Prompt..."
+            resize="vertical"
+          />
+          <div class="form-tip">
+            <span>{{ form.analysis_prompt ? `${form.analysis_prompt.length} 字符` : '未设置，将使用分类默认值' }}</span>
+            <el-button 
+              size="small" 
+              link 
+              type="warning" 
+              v-if="form.analysis_prompt"
+              @click="form.analysis_prompt = ''"
+            >清除</el-button>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="对比Prompt">
+          <el-input
+            v-model="form.comparison_prompt"
+            type="textarea"
+            :rows="6"
+            placeholder="留空则使用分类的默认对比Prompt..."
+            resize="vertical"
+          />
+          <div class="form-tip">
+            <span>{{ form.comparison_prompt ? `${form.comparison_prompt.length} 字符` : '未设置，将使用分类默认值' }}</span>
+            <el-button 
+              size="small" 
+              link 
+              type="warning" 
+              v-if="form.comparison_prompt"
+              @click="form.comparison_prompt = ''"
+            >清除</el-button>
+          </div>
         </el-form-item>
       </el-form>
 
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="submitting" @click="handleSubmit">
-          {{ isEdit ? '保存' : '上传' }}
+          {{ isEdit ? '保存修改' : '上传模板' }}
         </el-button>
       </template>
     </el-dialog>
@@ -134,6 +224,7 @@
 import { ref, onMounted } from 'vue'
 import api from '../api'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { EditPen, Plus, Picture } from '@element-plus/icons-vue'
 
 const templates = ref([])
 const loading = ref(false)
@@ -147,7 +238,9 @@ const form = ref({
   name: '',
   category: '',
   tagsStr: '',
-  thumbnail: null
+  thumbnail: null,
+  analysis_prompt: '',
+  comparison_prompt: ''
 })
 
 const rules = {
@@ -174,7 +267,14 @@ async function fetchTemplates() {
 function showUploadDialog() {
   isEdit.value = false
   currentEditId.value = null
-  form.value = { name: '', category: '', tagsStr: '', thumbnail: null }
+  form.value = { 
+    name: '', 
+    category: '', 
+    tagsStr: '', 
+    thumbnail: null,
+    analysis_prompt: '',
+    comparison_prompt: ''
+  }
   dialogVisible.value = true
 }
 
@@ -185,7 +285,9 @@ function editTemplate(template) {
     name: template.name,
     category: template.category,
     tagsStr: parseTags(template.tags).join(', '),
-    thumbnail: null
+    thumbnail: null,
+    analysis_prompt: template.analysis_prompt || '',
+    comparison_prompt: template.comparison_prompt || ''
   }
   dialogVisible.value = true
 }
@@ -210,6 +312,14 @@ async function handleSubmit() {
     
     if (form.value.thumbnail) {
       formData.append('thumbnail', form.value.thumbnail)
+    }
+
+    if (form.value.analysis_prompt) {
+      formData.append('analysis_prompt', form.value.analysis_prompt)
+    }
+
+    if (form.value.comparison_prompt) {
+      formData.append('comparison_prompt', form.value.comparison_prompt)
     }
 
     let res
@@ -278,7 +388,9 @@ function getCategoryName(category) {
     landscape: '风景',
     food: '美食',
     pet: '宠物',
+    architecture: '建筑',
     street: '街拍',
+    still_life: '静物',
     other: '其他'
   }
   return map[category] || category
@@ -314,5 +426,14 @@ onMounted(() => {
 
 .uploader {
   width: 100%;
+}
+
+.form-tip {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #909399;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

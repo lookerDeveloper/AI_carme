@@ -7,6 +7,7 @@ import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:path_provider/path_provider.dart';
 import 'providers/camera_provider.dart' as app_camera;
 import 'widgets/grid_overlay.dart';
+import 'widgets/ai_log_panel.dart';
 import '../domain/entities/camera_enums.dart' as app_enums;
 import '../../analysis/presentation/providers/analysis_provider.dart';
 import '../../analysis/presentation/widgets/feedback_panel.dart';
@@ -26,6 +27,7 @@ class CameraScreen extends ConsumerStatefulWidget {
 class _CameraScreenState extends ConsumerState<CameraScreen> {
   PhotoCameraState? _photoState;
   bool _isAnalyzing = false;
+  bool _showAiLogPanel = false;
 
   @override
   void initState() {
@@ -80,6 +82,11 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
           _buildScoreDisplay(analysisState),
           if (!_isAnalyzing) _buildAIAnalysisButton(),
           if (_isAnalyzing) _buildAnalyzingOverlay(),
+          AiLogPanel(
+            isExpanded: _showAiLogPanel,
+            onToggle: () => setState(() => _showAiLogPanel = !_showAiLogPanel),
+            onClose: () => setState(() => _showAiLogPanel = false),
+          ),
         ],
       ),
     );
@@ -481,16 +488,20 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   void _showAIDetailOptions() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFF1A1A1A),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Container(
-        height: 300,
-        padding: EdgeInsets.all(20),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(context).viewInsets.bottom + 10),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('🤖 AI智能分析选项', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-            SizedBox(height: 20),
+            SizedBox(height: 16),
             _buildAIOptionItem(Icons.auto_awesome, '美学评分', '综合评估照片的美学价值', () {
               Navigator.pop(context);
               _startAIAnalysis();
@@ -510,8 +521,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
               Navigator.pop(context);
               _startAIAnalysis();
             }),
-            Spacer(),
-            SafeArea(child: SizedBox()),
+            SizedBox(height: 8),
           ],
         ),
       ),

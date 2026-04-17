@@ -8,6 +8,7 @@ class AppSettings {
   final int dailyAnalysisCount;
   final String lastResetDate;
   final bool isProUser;
+  final bool enableAiLog;
 
   const AppSettings({
     this.aiModel = 'glm-4v',
@@ -19,6 +20,7 @@ class AppSettings {
     this.dailyAnalysisCount = 0,
     this.lastResetDate = '',
     this.isProUser = false,
+    this.enableAiLog = false,
   });
 
   AppSettings copyWith({
@@ -31,6 +33,7 @@ class AppSettings {
     int? dailyAnalysisCount,
     String? lastResetDate,
     bool? isProUser,
+    bool? enableAiLog,
   }) {
     return AppSettings(
       aiModel: aiModel ?? this.aiModel,
@@ -42,6 +45,7 @@ class AppSettings {
       dailyAnalysisCount: dailyAnalysisCount ?? this.dailyAnalysisCount,
       lastResetDate: lastResetDate ?? this.lastResetDate,
       isProUser: isProUser ?? this.isProUser,
+      enableAiLog: enableAiLog ?? this.enableAiLog,
     );
   }
 
@@ -55,6 +59,7 @@ class AppSettings {
         'dailyAnalysisCount': dailyAnalysisCount,
         'lastResetDate': lastResetDate,
         'isProUser': isProUser,
+        'enableAiLog': enableAiLog,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -67,5 +72,6 @@ class AppSettings {
         dailyAnalysisCount: json['dailyAnalysisCount'] as int? ?? 0,
         lastResetDate: json['lastResetDate'] as String? ?? '',
         isProUser: json['isProUser'] as bool? ?? false,
+        enableAiLog: json['enableAiLog'] as bool? ?? false,
       );
 }

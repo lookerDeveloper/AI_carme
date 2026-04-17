@@ -9,9 +9,9 @@ class ImageUtils {
 
   static Future<Uint8List> compressImage(
     Uint8List imageData, {
-    int maxWidth = 384,
-    int maxHeight = 384,
-    int quality = 60,
+    int maxWidth = 256,
+    int maxHeight = 256,
+    int quality = 50,
   }) async {
     return await compute(_compressImageWorker, _ImageTask(imageData, maxWidth, maxHeight, quality));
   }

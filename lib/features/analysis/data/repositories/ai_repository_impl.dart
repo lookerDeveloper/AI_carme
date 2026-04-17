@@ -11,6 +11,12 @@ class AIRepositoryImpl implements AIRepository {
   AIRepositoryImpl(this._aiService);
 
   @override
+  bool get enableAiLog => _aiService.enableAiLog;
+
+  @override
+  set enableAiLog(bool value) => _aiService.enableAiLog = value;
+
+  @override
   Future<AnalysisResult> analyzeFrame(Uint8List imageData, {
     Uint8List? referenceImageData,
     Map<String, dynamic>? cameraParams,

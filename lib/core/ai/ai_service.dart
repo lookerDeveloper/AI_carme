@@ -5,6 +5,7 @@ import 'ai_model.dart';
 import '../../features/analysis/domain/entities/analysis_result.dart';
 import '../../features/analysis/domain/entities/comparison_result.dart';
 import '../utils/image_utils.dart';
+import '../utils/app_logger.dart';
 
 abstract class AIService {
   Future<AnalysisResult> analyzeFrame(Uint8List imageData, {
@@ -23,17 +24,35 @@ abstract class AIService {
 
   void switchModel(AIModel model);
   AIModel get currentModel;
+  
+  bool get enableAiLog;
+  set enableAiLog(bool value);
 }
 
 class GLM4VService implements AIService {
   final Dio _dio;
   AIModel _currentModel = AIModel.glm4v;
   final String apiKey;
+  bool _enableAiLog = false;
 
   GLM4VService({
     required this.apiKey,
     Dio? dio,
-  }) : _dio = dio ?? Dio();
+    bool? enableAiLog,
+  }) : _dio = dio ?? Dio() {
+    if (enableAiLog != null) {
+      _enableAiLog = enableAiLog;
+    }
+  }
+
+  @override
+  bool get enableAiLog => _enableAiLog;
+
+  @override
+  set enableAiLog(bool value) {
+    _enableAiLog = value;
+    AppLogger.logInfo('AI日志开关: ${value ? "已开启" : "已关闭"}', tag: 'AI');
+  }
 
   @override
   AIModel get currentModel => _currentModel;
@@ -83,6 +102,24 @@ class GLM4VService implements AIService {
     ];
 
     try {
+      final startTime = DateTime.now();
+      
+      if (_enableAiLog) {
+        AppLogger.logInfo('========== [AI请求开始] ==========', tag: 'AI');
+        AppLogger.logInfo('接口: glm-4v-flash 分析帧', tag: 'AI');
+        AppLogger.logInfo('模型: glm-4v-flash', tag: 'AI');
+        AppLogger.logInfo('原始图片大小: ${imageData.length} bytes', tag: 'AI');
+        AppLogger.logInfo('压缩后大小: ${compressedImage.length} bytes (${(compressedImage.length / imageData.length * 100).toStringAsFixed(1)}%)', tag: 'AI');
+        AppLogger.logInfo('参考图: ${referenceImageData != null ? "有" : "无"}', tag: 'AI');
+        AppLogger.logInfo('Prompt来源: ${analysisPrompt != null ? "自定义/分类Prompt" : "默认通用Prompt"}', tag: 'AI');
+        AppLogger.logInfo('Prompt长度: ${prompt.length} 字符', tag: 'AI');
+        AppLogger.logInfo('--- Prompt内容预览 ---\n${prompt.substring(0, prompt.length > 200 ? 200 : prompt.length)}...', tag: 'AI');
+        if (referenceImageData != null) {
+          final refCompressedSize = await ImageUtils.compressImage(referenceImageData);
+          AppLogger.logInfo('参考图压缩后大小: ${refCompressedSize.length} bytes', tag: 'AI');
+        }
+      }
+
       final response = await _dio.post(
         'https://open.bigmodel.cn/api/paas/v4/chat/completions',
         options: Options(
@@ -94,12 +131,38 @@ class GLM4VService implements AIService {
         data: {
           'model': 'glm-4v-flash',
           'messages': messages,
-          'max_tokens': 1024,
+          'max_tokens': 512,
           'temperature': 0.7,
         },
       );
 
       final content = response.data['choices'][0]['message']['content'];
+      final duration = DateTime.now().difference(startTime).inMilliseconds;
+
+      if (_enableAiLog) {
+        AppLogger.logInfo('========== [AI响应返回] ==========', tag: 'AI');
+        AppLogger.logInfo('耗时: ${duration}ms', tag: 'AI');
+        AppLogger.logInfo('HTTP状态码: ${response.statusCode}', tag: 'AI');
+        AppLogger.logInfo('原始响应长度: ${content.length} 字符', tag: 'AI');
+        AppLogger.logInfo('--- 原始响应内容 ---\n$content', tag: 'AI');
+        
+        try {
+          final parsedResult = _parseAnalysisResult(content);
+          AppLogger.logInfo('--- 解析后结果 ---', tag: 'AI');
+          AppLogger.logInfo('美学评分: ${parsedResult.aestheticScore}', tag: 'AI');
+          AppLogger.logInfo('场景类型: ${parsedResult.sceneType}', tag: 'AI');
+          AppLogger.logInfo('建议数量: ${parsedResult.suggestions.length}', tag: 'AI');
+          if (parsedResult.suggestions.isNotEmpty) {
+            AppLogger.logInfo('建议列表: ${parsedResult.suggestions.join(" | ")}', tag: 'AI');
+          }
+          AppLogger.logInfo('相机调整: 移动=${parsedResult.cameraAdjustments.moveDirection} 幅度=${parsedResult.cameraAdjustments.moveAmount}', tag: 'AI');
+          AppLogger.logInfo('推荐参数: 焦距=${parsedResult.recommendedParams.focalLength} 光圈=${parsedResult.recommendedParams.aperture} ISO=${parsedResult.recommendedParams.iso}', tag: 'AI');
+          AppLogger.logInfo('=====================================\n', tag: 'AI');
+        } catch (e) {
+          AppLogger.logError('解析结果日志记录失败: $e', tag: 'AI');
+        }
+      }
+
       return _parseAnalysisResult(content);
     } catch (e) {
       return AnalysisResult(
@@ -149,6 +212,19 @@ class GLM4VService implements AIService {
     ];
 
     try {
+      final startTime = DateTime.now();
+
+      if (_enableAiLog) {
+        AppLogger.logInfo('========== [AI请求开始] ==========', tag: 'AI');
+        AppLogger.logInfo('接口: glm-4v-flash 对比参考图', tag: 'AI');
+        AppLogger.logInfo('模型: glm-4v-flash', tag: 'AI');
+        AppLogger.logInfo('当前图片大小: ${currentImageData.length} bytes -> 压缩后 ${compressedCurrent.length} bytes', tag: 'AI');
+        AppLogger.logInfo('参考图片大小: ${referenceImageData.length} bytes -> 压缩后 ${compressedReference.length} bytes', tag: 'AI');
+        AppLogger.logInfo('Prompt来源: ${comparisonPrompt != null ? "自定义/分类Prompt" : "默认通用Prompt"}', tag: 'AI');
+        AppLogger.logInfo('Prompt长度: ${prompt.length} 字符', tag: 'AI');
+        AppLogger.logInfo('--- Prompt内容预览 ---\n${prompt.substring(0, prompt.length > 200 ? 200 : prompt.length)}...', tag: 'AI');
+      }
+
       final response = await _dio.post(
         'https://open.bigmodel.cn/api/paas/v4/chat/completions',
         options: Options(
@@ -160,12 +236,39 @@ class GLM4VService implements AIService {
         data: {
           'model': 'glm-4v-flash',
           'messages': messages,
-          'max_tokens': 1024,
+          'max_tokens': 512,
           'temperature': 0.7,
         },
       );
 
       final content = response.data['choices'][0]['message']['content'];
+      final duration = DateTime.now().difference(startTime).inMilliseconds;
+
+      if (_enableAiLog) {
+        AppLogger.logInfo('========== [AI响应返回] ==========', tag: 'AI');
+        AppLogger.logInfo('耗时: ${duration}ms', tag: 'AI');
+        AppLogger.logInfo('HTTP状态码: ${response.statusCode}', tag: 'AI');
+        AppLogger.logInfo('原始响应长度: ${content.length} 字符', tag: 'AI');
+        AppLogger.logInfo('--- 原始响应内容 ---\n$content', tag: 'AI');
+
+        try {
+          final parsedResult = _parseComparisonResult(content);
+          AppLogger.logInfo('--- 解析后结果 ---', tag: 'AI');
+          AppLogger.logInfo('相似度评分: ${parsedResult.similarityScore}', tag: 'AI');
+          AppLogger.logInfo('主体位置差异: ${parsedResult.compositionGap.subjectPositionDiff}', tag: 'AI');
+          AppLogger.logInfo('角度差异: ${parsedResult.compositionGap.angleDiff}', tag: 'AI');
+          AppLogger.logInfo('距离差异: ${parsedResult.compositionGap.distanceDiff}', tag: 'AI');
+          AppLogger.logInfo('调整步骤数量: ${parsedResult.steps.length}', tag: 'AI');
+          if (parsedResult.steps.isNotEmpty) {
+            AppLogger.logInfo('调整步骤: ${parsedResult.steps.join(" | ")}', tag: 'AI');
+          }
+          AppLogger.logInfo('当前调整建议: ${parsedResult.currentAdjustment}', tag: 'AI');
+          AppLogger.logInfo('=====================================\n', tag: 'AI');
+        } catch (e) {
+          AppLogger.logError('解析结果日志记录失败: $e', tag: 'AI');
+        }
+      }
+
       return _parseComparisonResult(content);
     } catch (e) {
       return ComparisonResult(

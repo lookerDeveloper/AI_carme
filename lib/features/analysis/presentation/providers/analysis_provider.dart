@@ -10,6 +10,7 @@ import '../../data/repositories/ai_repository_impl.dart';
 import '../../../../core/ai/ai_service.dart';
 import '../../../../core/ai/ai_model.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/utils/app_logger.dart';
 
 final aiRepositoryProvider = Provider<AIRepository>((ref) {
   return AIRepositoryImpl(GLM4VService(apiKey: '03bfdfdf155849928b40cecc07479972.ZWLOwhSh8apHHYj4'));
@@ -32,6 +33,7 @@ class AnalysisState {
   final PoseData? currentPose;
   final String? errorMessage;
   final DateTime? lastAnalysisTime;
+  final bool enableAiLog;
 
   const AnalysisState({
     this.currentResult,
@@ -41,6 +43,7 @@ class AnalysisState {
     this.currentPose,
     this.errorMessage,
     this.lastAnalysisTime,
+    this.enableAiLog = false,
   });
 
   AnalysisState copyWith({
@@ -51,6 +54,7 @@ class AnalysisState {
     PoseData? currentPose,
     String? errorMessage,
     DateTime? lastAnalysisTime,
+    bool? enableAiLog,
   }) {
     return AnalysisState(
       currentResult: currentResult ?? this.currentResult,
@@ -60,6 +64,7 @@ class AnalysisState {
       currentPose: currentPose ?? this.currentPose,
       errorMessage: errorMessage ?? this.errorMessage,
       lastAnalysisTime: lastAnalysisTime ?? this.lastAnalysisTime,
+      enableAiLog: enableAiLog ?? this.enableAiLog,
     );
   }
 
@@ -77,7 +82,11 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
   StreamSubscription? _frameSubscription;
 
   AnalysisNotifier(this._aiRepository, this._poseDetector)
-      : super(const AnalysisState());
+      : super(const AnalysisState()) {
+    if (_aiRepository is AIService) {
+      (_aiRepository as AIService).enableAiLog = state.enableAiLog;
+    }
+  }
 
   void startAnalysis(Stream<Uint8List> frameStream) {
     _frameSubscription?.cancel();
@@ -185,10 +194,30 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
     _aiRepository.switchModel(model);
   }
 
+  void toggleAiLog() {
+    final newValue = !state.enableAiLog;
+    setEnableAiLog(newValue);
+  }
+
+  void setEnableAiLog(bool value) {
+    state = state.copyWith(enableAiLog: value);
+    _aiRepository.enableAiLog = value;
+    AppLogger.logInfo('AI日志开关: ${value ? "已开启" : "已关闭"}', tag: 'AI');
+  }
+
   void onPhotoCaptured(String filePath) {}
 
   void clearResults() {
-    state = const AnalysisState();
+    final currentEnableAiLog = state.enableAiLog;
+    state = state.copyWith(
+      currentResult: null,
+      currentComparison: null,
+      previousScore: 0,
+      errorMessage: null,
+    );
+    if (_aiRepository is AIService) {
+      (_aiRepository as AIService).enableAiLog = currentEnableAiLog;
+    }
   }
 
   Future<void> analyzeFromImage(Uint8List imageData, {String? analysisPrompt}) async {

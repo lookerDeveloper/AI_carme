@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum LogLevel { debug, info, warn, error }
+
+typedef LogUpdateCallback = void Function(List<String> logs);
 
 class AppLogger {
   static const String _tag = 'AICamCoach';
@@ -12,6 +15,21 @@ class AppLogger {
   static LogLevel _minLevel = LogLevel.debug;
   static List<String> _logBuffer = [];
   static const int _maxBufferSize = 500;
+  static final List<LogUpdateCallback> _listeners = [];
+
+  static void addListener(LogUpdateCallback callback) {
+    _listeners.add(callback);
+  }
+
+  static void removeListener(LogUpdateCallback callback) {
+    _listeners.remove(callback);
+  }
+
+  static void _notifyListeners() {
+    for (final callback in _listeners) {
+      callback(List.from(_logBuffer));
+    }
+  }
 
   static Future<void> initialize({LogLevel minLevel = LogLevel.debug}) async {
     if (_isInitialized) return;
@@ -62,6 +80,8 @@ class AppLogger {
     if (_logBuffer.length > _maxBufferSize) {
       _logBuffer.removeAt(0);
     }
+
+    _notifyListeners();
 
     developer.log(message, name: '$_tag/$tagStr', error: error, stackTrace: stackTrace, level: _getDeveloperLevel(level));
 

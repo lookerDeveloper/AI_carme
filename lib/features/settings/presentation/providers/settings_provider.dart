@@ -132,6 +132,20 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     if (state.settings.lastResetDate != today) return 5;
     return (5 - state.settings.dailyAnalysisCount).clamp(0, 5);
   }
+
+  void setProUser(bool value) {
+    state = state.copyWith(
+      settings: state.settings.copyWith(isProUser: value),
+    );
+    _saveSettings();
+  }
+
+  void setEnableAiLog(bool value) {
+    state = state.copyWith(
+      settings: state.settings.copyWith(enableAiLog: value),
+    );
+    _saveSettings();
+  }
 }
 
 final settingsProvider =

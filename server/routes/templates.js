@@ -39,7 +39,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     console.log(`🖼️ [${new Date().toLocaleString()}] 查询模板列表`);
-    
+
     const { category, search } = req.query;
     let whereClause = 'is_active = 1';
     const params = [];
@@ -55,14 +55,36 @@ router.get('/', async (req, res) => {
     }
 
     const templates = await db.prepare(`
-      SELECT * FROM templates 
+      SELECT * FROM templates
       WHERE ${whereClause}
       ORDER BY usage_count DESC, created_at DESC
     `).all(...params);
 
+    const categories = await db.prepare(`
+      SELECT value, analysis_prompt, comparison_prompt FROM categories
+    `).all();
+
+    const categoryMap = {};
+    for (const cat of categories) {
+      categoryMap[cat.value] = {
+        analysisPrompt: cat.analysis_prompt,
+        comparisonPrompt: cat.comparison_prompt,
+      };
+    }
+
+    const processedTemplates = templates.map(template => {
+      const categoryData = categoryMap[template.category] || {};
+      
+      return {
+        ...template,
+        analysis_prompt: template.analysis_prompt || categoryData.analysisPrompt || null,
+        comparison_prompt: template.comparison_prompt || categoryData.comparisonPrompt || null,
+      };
+    });
+
     res.json({
       success: true,
-      data: templates
+      data: processedTemplates
     });
   } catch (error) {
     console.error('获取模板列表失败:', error);

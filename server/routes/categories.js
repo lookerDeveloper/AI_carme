@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     console.log(`📂 [${new Date().toLocaleString()}] 查询分类列表`);
     
     const categories = await db.prepare(`
-      SELECT id, name, value, description, is_active, created_at, updated_at
+      SELECT id, name, value, description, analysis_prompt, comparison_prompt, is_active, created_at, updated_at
       FROM categories
       ORDER BY name ASC
     `).all();

@@ -75,6 +75,8 @@ class RemoteTemplateDataSource {
       tags: tags,
       compositionRules: compositionRules,
       cameraParams: cameraParams,
+      analysisPrompt: json['analysis_prompt'],
+      comparisonPrompt: json['comparison_prompt'],
       usageCount: json['usage_count'] ?? 0,
       createdAt: json['created_at'] != null 
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()

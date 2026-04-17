@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/settings_provider.dart';
 import '../../../../core/ai/ai_model.dart';
+import '../../../features/analysis/presentation/providers/analysis_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -54,6 +55,35 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           _buildSectionTitle('使用情况'),
           _buildUsageCard(ref, state),
+          const SizedBox(height: 24),
+          _buildSectionTitle('开发者工具'),
+          _buildSwitchTile(
+            icon: Icons.bug_report_outlined,
+            title: 'AI调用日志',
+            subtitle: '开启后可在面板查看AI请求/响应详情',
+            value: state.settings.enableAiLog,
+            onChanged: (value) {
+              ref.read(settingsProvider.notifier).setEnableAiLog(value);
+              ref.read(analysisProvider.notifier).setEnableAiLog(value);
+            },
+          ),
+          if (state.settings.enableAiLog)
+            Container(
+              margin: EdgeInsets.only(top: 8, bottom: 8),
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A1A00),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFF9800).withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.orangeAccent, size: 16),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('日志输出位置：IDE控制台 / logcat | 标签: AI', style: TextStyle(color: Colors.orangeAccent, fontSize: 11))),
+                ],
+              ),
+            ),
           const SizedBox(height: 24),
           _buildSectionTitle('关于'),
           _buildAboutCard(),

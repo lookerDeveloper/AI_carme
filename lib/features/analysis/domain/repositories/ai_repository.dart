@@ -20,4 +20,7 @@ abstract class AIRepository {
 
   void switchModel(AIModel model);
   AIModel get currentModel;
+
+  bool get enableAiLog;
+  set enableAiLog(bool value);
 }
