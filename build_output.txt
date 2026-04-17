@@ -1,0 +1,85 @@
+﻿Downloading android-arm-profile/windows-x64 tools...                3.3s
+Downloading android-arm-release/windows-x64 tools...               787ms
+Downloading android-arm64-profile/windows-x64 tools...             998ms
+Downloading android-arm64-release/windows-x64 tools...             774ms
+Downloading android-x64-profile/windows-x64 tools...               747ms
+Downloading android-x64-release/windows-x64 tools...             1,020ms
+Running Gradle task 'assembleDebug'...                          
+flutter : Exception in thread "main" java.net.ConnectException: Connection
+ timed out: connect
+所在位置 行:1 字符: 73
++ ... ; cd D:\tree_project\AI_carme; flutter build apk --debug 2>&1 | Out-
+F ...
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Exception in th...ed out: co 
+   nnect:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+	at java.net.DualStackPlainSocketImpl.connect0(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketIm
+pl.java:79)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.jav
+a:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketI
+mpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:
+188)
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:589)
+	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:673)
+	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
+	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
+	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
+	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHt
+tpClient(AbstractDelegateHttpsURLConnection.java:191)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConne
+ction.java:1156)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnec
+tion.java:1050)
+	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(
+AbstractDelegateHttpsURLConnection.java:177)
+	at sun.net.www.protocol.http.HttpURLConnection.followRedirect0(HttpURLCon
+nection.java:2719)
+	at sun.net.www.protocol.http.HttpURLConnection.followRedirect(HttpURLConn
+ection.java:2641)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLCon
+nection.java:1824)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConn
+ection.java:1492)
+	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(Https
+URLConnectionImpl.java:263)
+	at org.gradle.wrapper.Download.downloadInternal(Download.java:58)
+	at org.gradle.wrapper.Download.download(Download.java:44)
+	at org.gradle.wrapper.Install$1.call(Install.java:61)
+	at org.gradle.wrapper.Install$1.call(Install.java:48)
+	at org.gradle.wrapper.ExclusiveFileAccessManager.access(ExclusiveFileAcce
+ssManager.java:65)
+	at org.gradle.wrapper.Install.createDist(Install.java:48)
+	at org.gradle.wrapper.WrapperExecutor.execute(WrapperExecutor.java:128)
+	at org.gradle.wrapper.GradleWrapperMain.main(GradleWrapperMain.java:61)
+Running Gradle task 'assembleDebug'...                             25.5s
+[!] Gradle threw an error while downloading artifacts from the network.
+Retrying Gradle Build: #1, wait time: 100ms
+Running Gradle task 'assembleDebug'...                          
+Exception in thread "main" java.util.zip.ZipException: error in opening zi
+p file
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:225)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:155)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:169)
+	at org.gradle.wrapper.Install.unzip(Install.java:214)
+	at org.gradle.wrapper.Install.access$600(Install.java:27)
+	at org.gradle.wrapper.Install$1.call(Install.java:74)
+	at org.gradle.wrapper.Install$1.call(Install.java:48)
+	at org.gradle.wrapper.ExclusiveFileAccessManager.access(ExclusiveFileAcce
+ssManager.java:65)
+	at org.gradle.wrapper.Install.createDist(Install.java:48)
+	at org.gradle.wrapper.WrapperExecutor.execute(WrapperExecutor.java:128)
+	at org.gradle.wrapper.GradleWrapperMain.main(GradleWrapperMain.java:61)
+Running Gradle task 'assembleDebug'...                            865.1s
+[!] Gradle threw an error while downloading artifacts from the network.
+Gradle task assembleDebug failed with exit code 1

@@ -1,0 +1,112 @@
+{
+  "users": [
+    {
+      "id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "username": "admin",
+      "email": "admin@aicam.com",
+      "password": "$2a$10$ZMNGE.1eN8qHr1zK/K3pBesXowMLb7MdA0lpgVjgJ4A9jVAjCNe9C",
+      "role": "admin",
+      "avatar": null,
+      "is_active": 1,
+      "usage_count": 0,
+      "last_login_at": null,
+      "created_at": "2026-04-13T10:55:45.233Z",
+      "updated_at": "2026-04-13T10:55:45.234Z"
+    },
+    {
+      "id": "b70e5ebf-b845-4c00-bd09-05880e1df1a0",
+      "username": "test",
+      "email": "test@aicam.com",
+      "password": "$2a$10$xdxptH8KmR4Lic.qUSlOO.rpHPOLrMa03kjg/GlgZwGCMBAL61/9i",
+      "role": "user",
+      "avatar": null,
+      "is_active": 1,
+      "usage_count": 0,
+      "last_login_at": null,
+      "created_at": "2026-04-13T10:55:45.306Z",
+      "updated_at": "2026-04-13T10:55:45.306Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": "14c99ea0-5011-4b26-a387-3aad7233ef26",
+      "name": "测试补办",
+      "category": "portrait",
+      "thumbnail_url": "/uploads/e04e6bb2-b469-448e-ba4f-85d5eb3fa34b.png",
+      "tags": "[]",
+      "composition_rules": "{}",
+      "camera_params": "{}",
+      "uploaded_by": "068efc4d-2b16-4088-9af6-bc6ea944b108"
+    }
+  ],
+  "userTemplates": [],
+  "usageLogs": [],
+  "usage_logs": [
+    {
+      "id": "92608283-1a30-4fb8-8976-bca06b90ffac",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "LOGIN",
+      "details": "{\"method\":\"password\"}"
+    },
+    {
+      "id": "37470b25-a756-4e94-a9cd-5865c73e6282",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "TOGGLE_USER_STATUS",
+      "details": "{\"targetUserId\":\"b70e5ebf-b845-4c00-bd09-05880e1df1a0\",\"newStatus\":0}"
+    },
+    {
+      "id": "0b42095d-d4d0-4a1b-9671-9b53c2f58a7e",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "TOGGLE_USER_STATUS",
+      "details": "{\"targetUserId\":\"b70e5ebf-b845-4c00-bd09-05880e1df1a0\",\"newStatus\":1}"
+    },
+    {
+      "id": "f018a031-a12a-4cd1-ae08-8206c08ea636",
+      "user_id": "b70e5ebf-b845-4c00-bd09-05880e1df1a0",
+      "action": "LOGIN",
+      "details": "{\"method\":\"password\"}"
+    },
+    {
+      "id": "9cc228af-dc5e-4bed-a3ea-ed85106e2d90",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "TOGGLE_USER_STATUS",
+      "details": "{\"targetUserId\":\"b70e5ebf-b845-4c00-bd09-05880e1df1a0\",\"newStatus\":0}"
+    },
+    {
+      "id": "f59ae52f-e6fa-45ab-a7d4-cb04c14ad586",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "UPLOAD_TEMPLATE",
+      "details": "{\"templateId\":\"14c99ea0-5011-4b26-a387-3aad7233ef26\",\"name\":\"测试补办\",\"category\":\"portrait\"}"
+    },
+    {
+      "id": "92f04153-a0f2-48aa-882f-eb0957c518dc",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "TOGGLE_USER_STATUS",
+      "details": "{\"targetUserId\":\"b70e5ebf-b845-4c00-bd09-05880e1df1a0\",\"newStatus\":1}"
+    },
+    {
+      "id": "964fc6b5-04eb-4ce8-ace1-50303f4a64ff",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "UPDATE_TEMPLATE",
+      "details": "{\"templateId\":\"14c99ea0-5011-4b26-a387-3aad7233ef26\"}"
+    },
+    {
+      "id": "5f231bc7-e2d6-44a0-9aa2-e6dc77d6b5ef",
+      "user_id": "068efc4d-2b16-4088-9af6-bc6ea944b108",
+      "action": "LOGIN",
+      "details": "{\"method\":\"password\"}"
+    },
+    {
+      "id": "8f56f527-02f6-4aa2-b6d2-09a1ad9889d8",
+      "user_id": "b70e5ebf-b845-4c00-bd09-05880e1df1a0",
+      "action": "LOGIN",
+      "details": "{\"method\":\"password\"}"
+    },
+    {
+      "id": "6748491c-8b95-4afc-9b36-e53339875dc5",
+      "user_id": "b70e5ebf-b845-4c00-bd09-05880e1df1a0",
+      "action": "LOGIN",
+      "details": "{\"method\":\"password\"}"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+﻿Doctor summary (to see all details, run flutter doctor -v):
+[鈭歖 Flutter (Channel stable, 3.41.6, on Microsoft Windows [鐗堟湰 10.0.18363.1556], locale zh-CN)
+[鈭歖 Windows Version (10 涓撲笟鐗?64 浣? 1909)
+[!] Android toolchain - develop for Android devices (Android SDK version 30.0.2)
+    X cmdline-tools component is missing.
+      Try installing or updating Android Studio.
+      Alternatively, download the tools from https://developer.android.com/studio#command-line-tools-only and make sure to set the ANDROID_HOME environment variable.
+      See https://developer.android.com/studio/command-line for more details.
+    X Android license status unknown.
+      Run `flutter doctor --android-licenses` to accept the SDK licenses.
+      See https://flutter.dev/to/windows-android-setup for more details.
+[鈭歖 Chrome - develop for the web
+[鈭歖 Visual Studio - develop Windows apps (Visual Studio Enterprise 2022 17.13.0)
+[鈭歖 Connected device (3 available)
+[!] Network resources
+    X A network error occurred while checking "https://maven.google.com/": 淇″彿鐏秴鏃舵椂闂村凡鍒?
+! Doctor found issues in 2 categories.
